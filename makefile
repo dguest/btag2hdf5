@@ -78,7 +78,7 @@ LIBS         += $(ROOTLIBS)
 
 # --- add HDF5
 HDF_INFO := $(shell h5c++ -showconfig | grep 'Installation point:')
-HDF_PATH := $(strip $(shell echo $(HDF_INFO) | cut -d ':' -f 2 ))
+HDF_PATH ?= $(strip $(shell echo $(HDF_INFO) | cut -d ':' -f 2 ))
 ifndef HDF_PATH
 $(error "couldn't find HDF, quitting")
 endif
@@ -89,6 +89,7 @@ LIBS         += -lhdf5_cpp -lhdf5
 
 # boost
 ifdef BOOST_PATH
+CXXFLAGS     += -I$(BOOST_PATH)/include
 LIBS         += -L$(BOOST_PATH)/lib -Wl,-rpath,$(BOOST_PATH)/lib
 endif
 LIBS         += -lboost_program_options
