@@ -92,6 +92,7 @@ void SmartChain::SetBranchAddressPrivate(std::string name, void* branch,
     throw std::runtime_error(issue);
   }
   if (!GetBranch(name.c_str())) {
+    m_fake_branches.insert(name);
     throw_bad_branch(name);
   }
 
