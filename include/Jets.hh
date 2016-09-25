@@ -251,6 +251,7 @@ public:
   Jet getJet(int jet, int subjet) const;
   int size(int jet) const;
 private:
+  void init_branches(SmartChain& chain, const std::string& name);
   // subjet-wise branches
   // kinematics
   std::vector<std::vector<float> >* pt;
@@ -295,6 +296,8 @@ private:
   std::vector<std::vector<float> >* mv2c20;
   // std::vector<std::vector<double> >* mv2c100;
 
+  // disable if any of the branches are missing
+  bool m_valid;
 };
 
 class SubstructureMomentArray
@@ -304,6 +307,7 @@ public:
   SubstructureMoments getMoments(int) const;
   int size() const;
 private:
+  void init_branches(SmartChain& chain);
   std::vector<float>* m_tau21;
   std::vector<float>* m_c1;
   std::vector<float>* m_c2;
@@ -311,6 +315,9 @@ private:
   std::vector<float>* m_c2_beta2;
   std::vector<float>* m_d2;
   std::vector<float>* m_d2_beta2;
+
+  // disable if any of the branches are missing
+  bool m_valid;
 };
 
 class Jets
@@ -445,7 +452,8 @@ private:
 
   std::vector<std::vector<int> >* jet_trk_jf_Vertex;
 
-
+  // turn some branches off if they aren't valid
+  bool m_clusters_valid;
 };
 
 

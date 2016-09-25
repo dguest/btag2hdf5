@@ -97,7 +97,16 @@ namespace {
   }
 }
 
-Subjets::Subjets(SmartChain& chain, const std::string& name) {
+Subjets::Subjets(SmartChain& chain, const std::string& name):
+  m_valid(true)
+{
+  try {
+    init_branches(chain, name);
+  } catch (MissingBranchError& err) {
+    m_valid = false;
+  }
+}
+void Subjets::init_branches(SmartChain& chain, const std::string& name) {
   auto nm = [&name](const std::string& var) {
     return "jet_" + name + "_" + var;
   };
@@ -157,7 +166,7 @@ Subjets::Subjets(SmartChain& chain, const std::string& name) {
 }
 
 Jet Subjets::getJet(int jet, int subjet) const {
-// #define COPY(var) o.jet_ ## var = var->at(jet).at(subjet)
+  if (!m_valid) throw std::logic_error("no subjets to access");
 #define COPY(var) o.jet_ ## var = getValue(*var, jet, subjet, #var)
   Jet o;
 
@@ -204,10 +213,20 @@ Jet Subjets::getJet(int jet, int subjet) const {
   return o;
 }
 int Subjets::size(int jet) const {
+  if (!m_valid) throw std::logic_error("no subjets to access");
   return pt->at(jet).size();
 }
 
-SubstructureMomentArray::SubstructureMomentArray(SmartChain& chain) {
+SubstructureMomentArray::SubstructureMomentArray(SmartChain& chain):
+  m_valid(true)
+{
+  try {
+    init_branches(chain);
+  } catch (MissingBranchError& err) {
+    m_valid = false;
+  }
+}
+void SubstructureMomentArray::init_branches(SmartChain& chain) {
   auto nm = [](const std::string& var) {
     return "jet_substructure_moment_" + var;
   };
@@ -223,6 +242,7 @@ SubstructureMomentArray::SubstructureMomentArray(SmartChain& chain) {
 }
 
 SubstructureMoments SubstructureMomentArray::getMoments(int number) const {
+  if (!m_valid) throw std::logic_error("no subjets to access");
 #define COPY(var) o.var = m_ ## var->at(number)
   SubstructureMoments o;
   COPY(tau21);
@@ -236,6 +256,7 @@ SubstructureMoments SubstructureMomentArray::getMoments(int number) const {
 #undef COPY
 }
 int SubstructureMomentArray::size() const {
+  if (!m_valid) throw std::logic_error("no subjets to access");
   return m_tau21->size();
 }
 
@@ -243,7 +264,8 @@ Jets::Jets(SmartChain& chain):
   m_chain(&chain),
   m_trkjet(chain, "trkjet"),
   m_vrtrkjet(chain, "vrtrkjet"),
-  m_moments(chain)
+  m_moments(chain),
+  m_clusters_valid(true)
 {
 #define SET_BRANCH(variable) m_chain->SetBranch(#variable, &variable)
   // event
@@ -263,6 +285,7 @@ Jets::Jets(SmartChain& chain):
   SET_BRANCH(jet_truthflav);
 
   // cluster and calo
+  try {
   SET_BRANCH(jet_cluster_pt                 );
   SET_BRANCH(jet_cluster_eta                );
   SET_BRANCH(jet_cluster_phi                );
@@ -279,6 +302,9 @@ Jets::Jets(SmartChain& chain):
   SET_BRANCH(jet_cluster_em_probability     );
   SET_BRANCH(jet_cluster_eng_frac_max       );
   SET_BRANCH(jet_cluster_first_eng_dens     );
+  } catch (MissingBranchError& err) {
+    m_clusters_valid = false;
+  }
 
   // jet_ntrk is defined from the size of a vector later
   SET_BRANCH(jet_ip3d_ntrk);
@@ -387,22 +413,24 @@ Jet Jets::getJet(int pos) const {
   COPY(jet_truthflav);
 
   // cluster
-  o.jet_cluster_pt = multiply<float>(jet_cluster_pt->at(pos),MeV);
-  COPY(jet_cluster_eta);
-  COPY(jet_cluster_phi);
-  o.jet_cluster_e = multiply<float>(jet_cluster_e->at(pos), MeV);
-  COPY(jet_cluster_clustersize        );
-  COPY(jet_cluster_isolation          );
-  COPY(jet_cluster_lateral            );
-  COPY(jet_cluster_longitudinal       );
-  COPY(jet_cluster_second_lambda      );
-  COPY(jet_cluster_second_r           );
-  COPY(jet_cluster_center_lambda      );
-  COPY(jet_cluster_center_mag         );
-  COPY(jet_cluster_eng_pos            );
-  COPY(jet_cluster_em_probability     );
-  COPY(jet_cluster_eng_frac_max       );
-  COPY(jet_cluster_first_eng_dens     );
+  if (m_clusters_valid) {
+    o.jet_cluster_pt = multiply<float>(jet_cluster_pt->at(pos),MeV);
+    COPY(jet_cluster_eta);
+    COPY(jet_cluster_phi);
+    o.jet_cluster_e = multiply<float>(jet_cluster_e->at(pos), MeV);
+    COPY(jet_cluster_clustersize        );
+    COPY(jet_cluster_isolation          );
+    COPY(jet_cluster_lateral            );
+    COPY(jet_cluster_longitudinal       );
+    COPY(jet_cluster_second_lambda      );
+    COPY(jet_cluster_second_r           );
+    COPY(jet_cluster_center_lambda      );
+    COPY(jet_cluster_center_mag         );
+    COPY(jet_cluster_eng_pos            );
+    COPY(jet_cluster_em_probability     );
+    COPY(jet_cluster_eng_frac_max       );
+    COPY(jet_cluster_first_eng_dens     );
+  }
 
   // track counts
   o.jet_ntrk = jet_trk_pt->at(pos).size();
