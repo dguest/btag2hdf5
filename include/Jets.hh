@@ -54,6 +54,7 @@ struct Jet
 
   // flavor label
   int jet_truthflav;
+  int jet_LabDr_HadF;
 
   // cluster and calo
   std::vector<float> jet_cluster_pt                  ;
@@ -103,7 +104,7 @@ struct Jet
   float jet_jf_efc;
   float jet_jf_deta;
   float jet_jf_dphi;
-  float jet_jf_ntrkAtVx;
+  int jet_jf_ntrkAtVx;
   int jet_jf_nvtx;
   float jet_jf_sig3d;
   int jet_jf_nvtx1t;
@@ -250,6 +251,7 @@ public:
   Subjets(SmartChain& chain, const std::string& name);
   Jet getJet(int jet, int subjet) const;
   int size(int jet) const;
+  bool valid() const;
 private:
   void init_branches(SmartChain& chain, const std::string& name);
   // subjet-wise branches
@@ -306,6 +308,7 @@ public:
   SubstructureMomentArray(SmartChain& chain);
   SubstructureMoments getMoments(int) const;
   int size() const;
+  bool valid() const;
 private:
   void init_branches(SmartChain& chain);
   std::vector<float>* m_tau21;
@@ -349,6 +352,7 @@ private:
 
   // flavor label
   std::vector<int>* jet_truthflav;
+  std::vector<int>* jet_LabDr_HadF;
 
   // cluster and calo
   std::vector<std::vector<float> >* jet_cluster_pt                  ;
@@ -454,6 +458,15 @@ private:
 
   // turn some branches off if they aren't valid
   bool m_clusters_valid;
+};
+
+// ______________________________________________________________________
+// exceptions
+
+class DisabledBranchError: public std::logic_error
+{
+public:
+  DisabledBranchError(const std::string& what_arg);
 };
 
 

@@ -166,7 +166,7 @@ void Subjets::init_branches(SmartChain& chain, const std::string& name) {
 }
 
 Jet Subjets::getJet(int jet, int subjet) const {
-  if (!m_valid) throw std::logic_error("no subjets to access");
+  if (!m_valid) throw DisabledBranchError("no subjets to access");
 #define COPY(var) o.jet_ ## var = getValue(*var, jet, subjet, #var)
   Jet o;
 
@@ -213,9 +213,13 @@ Jet Subjets::getJet(int jet, int subjet) const {
   return o;
 }
 int Subjets::size(int jet) const {
-  if (!m_valid) throw std::logic_error("no subjets to access");
+  if (!m_valid) throw DisabledBranchError("no subjets");
   return pt->at(jet).size();
 }
+bool Subjets::valid() const {
+  return m_valid;
+}
+
 
 SubstructureMomentArray::SubstructureMomentArray(SmartChain& chain):
   m_valid(true)
@@ -242,7 +246,7 @@ void SubstructureMomentArray::init_branches(SmartChain& chain) {
 }
 
 SubstructureMoments SubstructureMomentArray::getMoments(int number) const {
-  if (!m_valid) throw std::logic_error("no subjets to access");
+  if (!m_valid) throw DisabledBranchError("no moments to access");
 #define COPY(var) o.var = m_ ## var->at(number)
   SubstructureMoments o;
   COPY(tau21);
@@ -256,9 +260,13 @@ SubstructureMoments SubstructureMomentArray::getMoments(int number) const {
 #undef COPY
 }
 int SubstructureMomentArray::size() const {
-  if (!m_valid) throw std::logic_error("no subjets to access");
+  if (!m_valid) throw DisabledBranchError("no moments to access");
   return m_tau21->size();
 }
+bool SubstructureMomentArray::valid() const {
+  return m_valid;
+}
+
 
 Jets::Jets(SmartChain& chain):
   m_chain(&chain),
@@ -283,6 +291,7 @@ Jets::Jets(SmartChain& chain):
 
   // flavor label
   SET_BRANCH(jet_truthflav);
+  SET_BRANCH(jet_LabDr_HadF);
 
   // cluster and calo
   try {
@@ -411,6 +420,7 @@ Jet Jets::getJet(int pos) const {
 
   // flavor label                 // flavor label
   COPY(jet_truthflav);
+  COPY(jet_LabDr_HadF);
 
   // cluster
   if (m_clusters_valid) {
@@ -525,22 +535,29 @@ Jet Jets::getJet(int pos) const {
 
   assert(pass_checks(o));
 
-  for (int sub_pos = 0; sub_pos < m_trkjet.size(pos); sub_pos++) {
-    auto jet = m_trkjet.getJet(pos, sub_pos);
-    jet.dphi_fatjet = phi_mpi_pi(jet.jet_phi, o.jet_phi);
-    o.trkjets.push_back(jet);
-  }
-  for (int sub_pos = 0; sub_pos < m_vrtrkjet.size(pos); sub_pos++) {
-    auto jet = m_vrtrkjet.getJet(pos, sub_pos);
-    jet.dphi_fatjet = phi_mpi_pi(jet.jet_phi, o.jet_phi);
-    o.vrtrkjets.push_back(jet);
-  }
-  std::sort(o.trkjets.begin(), o.trkjets.end(),
-            [](const Jet& f, const Jet& s){return f.jet_pt > s.jet_pt; });
-  std::sort(o.vrtrkjets.begin(), o.vrtrkjets.end(),
-            [](const Jet& f, const Jet& s){return f.jet_pt > s.jet_pt; });
+  if (m_trkjet.valid()) {
+    for (int sub_pos = 0; sub_pos < m_trkjet.size(pos); sub_pos++) {
+      auto jet = m_trkjet.getJet(pos, sub_pos);
+      jet.dphi_fatjet = phi_mpi_pi(jet.jet_phi, o.jet_phi);
+      o.trkjets.push_back(jet);
+    }
+    std::sort(o.trkjets.begin(), o.trkjets.end(),
+              [](const Jet& f, const Jet& s){return f.jet_pt > s.jet_pt; });
 
-  o.moments = m_moments.getMoments(pos);
+  }
+  if (m_vrtrkjet.valid()) {
+    for (int sub_pos = 0; sub_pos < m_vrtrkjet.size(pos); sub_pos++) {
+      auto jet = m_vrtrkjet.getJet(pos, sub_pos);
+      jet.dphi_fatjet = phi_mpi_pi(jet.jet_phi, o.jet_phi);
+      o.vrtrkjets.push_back(jet);
+    }
+    std::sort(o.vrtrkjets.begin(), o.vrtrkjets.end(),
+                [](const Jet& f, const Jet& s){return f.jet_pt > s.jet_pt; });
+
+  }
+  if (m_moments.valid()) {
+    o.moments = m_moments.getMoments(pos);
+  }
   return o;
 };
 double Jets::eventWeight() const {
@@ -696,4 +713,11 @@ std::map<std::string, double> get_map(const Jet& jet) {
 std::ostream& operator<<(std::ostream& out, const SubstructureMoments& mom) {
   assert(false);
   return out;
+}
+
+// ________________________________________________________________________
+// exceptions
+DisabledBranchError::DisabledBranchError(const std::string& what):
+  std::logic_error(what)
+{
 }
