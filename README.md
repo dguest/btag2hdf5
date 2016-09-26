@@ -39,3 +39,23 @@ experimental.
 
 There is some standard pt, eta, and JVT selection applied to jets. For
 details look in `src/select_jet.cxx`.
+
+### How to read the output ###
+
+The output files should be easy to read with h5py:
+
+```python
+from h5py import File
+
+file = File('the-output.h5') # <- load file
+jets = file['jets']          # <- get jets dataset
+
+# you can read in slices
+slice = jets[:1000]          # <- get the first thousand jets
+
+# or select variables
+pt = jets['pt']              # <- select the pt array
+```
+
+This step doesn't depend on ROOT, so it should be easy to install
+everything you need via `pip`.
