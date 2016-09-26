@@ -4,7 +4,7 @@ Optimization Framework To HDF5 Converter
 This converts ROOT files from the b-tagging optimization framework
 into HDF5 files for use with DL1 / IPRNN / whatever algorithm.
 
-#### Setup ####
+### Setup ###
 
 Assuming you have CVMFS, you can run the following to set up for the
 first time:
@@ -20,7 +20,7 @@ After building all the libraries _should_ be permanently linked to
 CVMFS (thanks to some `-rpath` magic). **There should be no need to
 run the setup script next time you log in.**
 
-##### If you don't have CVMFS #####
+#### If you don't have CVMFS ####
 
 You'll need the following:
 
@@ -28,9 +28,14 @@ You'll need the following:
  - boost: for `program_options`
  - HDF5: with the C++ bindings installed
 
-#### Running ####
+### Running ###
 
 The executables will be built as `./bin/btag-*`. For more "standard"
 b-taggers, you can use `btag-write-track-jets`. For studies with fat
 jets, there's also `btag-write-fat-jets`. Note that this is more
 experimental.
+
+#### Note On Selection ####
+
+There is some standard pt, eta, and JVT selection applied to jets. For
+details look in `src/select_jet.cxx`.
