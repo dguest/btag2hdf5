@@ -108,7 +108,7 @@ namespace {
 
   template<typename T>
   T getValue(const std::vector<std::vector<T> >& vec,
-             int p1, int p2, const std::string& name) {
+             size_t p1, size_t p2, const std::string& name) {
     if (vec.size() <= p1) {
       throw std::logic_error(
         "can't access jet " + std::to_string(p1) + " in vector " + name);
@@ -189,7 +189,7 @@ void Subjets::init_branches(SmartChain& chain, const std::string& name) {
 #undef SET_BRANCH
 }
 
-Jet Subjets::getJet(int jet, int subjet) const {
+Jet Subjets::getJet(size_t jet, size_t subjet) const {
   if (!m_valid) throw DisabledBranchError("no subjets to access");
 #define COPY(var) o.jet_ ## var = getValue(*var, jet, subjet, #var)
   Jet o;
@@ -236,7 +236,7 @@ Jet Subjets::getJet(int jet, int subjet) const {
 
   return o;
 }
-int Subjets::size(int jet) const {
+size_t Subjets::size(size_t jet) const {
   if (!m_valid) throw DisabledBranchError("no subjets");
   return pt->at(jet).size();
 }
@@ -283,7 +283,7 @@ SubstructureMoments SubstructureMomentArray::getMoments(int number) const {
   return o;
 #undef COPY
 }
-int SubstructureMomentArray::size() const {
+size_t SubstructureMomentArray::size() const {
   if (!m_valid) throw DisabledBranchError("no moments to access");
   return m_tau21->size();
 }
@@ -425,7 +425,7 @@ Jets::Jets(SmartChain& chain):
 
 #undef SET_BRANCH
 }
-int Jets::size() const {
+size_t Jets::size() const {
   return jet_pt->size();
 }
 Jet Jets::getJet(int pos) const {
@@ -568,7 +568,7 @@ Jet Jets::getJet(int pos) const {
   assert(pass_checks(o));
 
   if (m_trkjet.valid()) {
-    for (int sub_pos = 0; sub_pos < m_trkjet.size(pos); sub_pos++) {
+    for (size_t sub_pos = 0; sub_pos < m_trkjet.size(pos); sub_pos++) {
       auto jet = m_trkjet.getJet(pos, sub_pos);
       jet.dphi_fatjet = phi_mpi_pi(jet.jet_phi, o.jet_phi);
       o.trkjets.push_back(jet);
@@ -578,7 +578,7 @@ Jet Jets::getJet(int pos) const {
 
   }
   if (m_vrtrkjet.valid()) {
-    for (int sub_pos = 0; sub_pos < m_vrtrkjet.size(pos); sub_pos++) {
+    for (size_t sub_pos = 0; sub_pos < m_vrtrkjet.size(pos); sub_pos++) {
       auto jet = m_vrtrkjet.getJet(pos, sub_pos);
       jet.dphi_fatjet = phi_mpi_pi(jet.jet_phi, o.jet_phi);
       o.vrtrkjets.push_back(jet);

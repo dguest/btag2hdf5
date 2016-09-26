@@ -260,8 +260,8 @@ class Subjets
 {
 public:
   Subjets(SmartChain& chain, const std::string& name);
-  Jet getJet(int jet, int subjet) const;
-  int size(int jet) const;
+  Jet getJet(size_t jet, size_t subjet) const;
+  size_t size(size_t jet) const;
   bool valid() const;
 private:
   void init_branches(SmartChain& chain, const std::string& name);
@@ -318,7 +318,7 @@ class SubstructureMomentArray
 public:
   SubstructureMomentArray(SmartChain& chain);
   SubstructureMoments getMoments(int) const;
-  int size() const;
+  size_t size() const;
   bool valid() const;
 private:
   void init_branches(SmartChain& chain);
@@ -339,7 +339,7 @@ class Jets
 public:
   Jets(SmartChain& chain);
   Jet getJet(int) const;
-  int size() const;
+  size_t size() const;
   double eventWeight() const;
 private:
   SmartChain* m_chain;
