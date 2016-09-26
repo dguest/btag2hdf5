@@ -69,9 +69,8 @@ GEN_OBJ_PATHS  += $(TDICT_PATHS)
 # --- load in root config
 ROOTCFLAGS    := $(shell root-config --cflags)
 
-ROOTLIBS      := -L$(shell root-config --libdir)
+ROOTLIBS      := -L$(shell root-config --libs)
 ROOTLIBS      += -Wl,-rpath,$(shell root-config --libdir)
-ROOTLIBS      += -lCore -lRIO -lTree -lPhysics
 
 ROOTLDFLAGS   := $(shell root-config --ldflags)
 
