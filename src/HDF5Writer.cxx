@@ -158,6 +158,9 @@ namespace {
     INSERT(sv1_m);
     INSERT(sv1_efc);
     INSERT(sv1_normdist);
+    INSERT(sv1_dR);
+    INSERT(sv1_Lxy);
+    INSERT(sv1_Lxyz);
 
     // Jetfitter
     INSERT(jf_m);

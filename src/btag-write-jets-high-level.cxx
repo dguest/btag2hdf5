@@ -34,6 +34,9 @@ namespace {
     COPY(sv1_m);
     COPY(sv1_efc);
     COPY(sv1_normdist);
+    COPY(sv1_dR);
+    COPY(sv1_Lxy);
+    COPY(sv1_Lxyz);
 
     // Jetfitter
     COPY(jf_m);

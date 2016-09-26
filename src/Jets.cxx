@@ -4,6 +4,8 @@
 
 #include "SmartChain.hh"
 
+#include "TVector3.h"
+
 #include <vector>
 #include <algorithm> // sort
 #include <cassert>
@@ -21,6 +23,26 @@ namespace {
                               std::numeric_limits<vtype>::infinity());
     return in;
   }
+
+  void fill_sv1_vertex(Jet& j) {
+    size_t nvtx = j.jet_sv1_vtx_x.size();
+    if (nvtx == 0) {
+      j.jet_sv1_dR = NAN;
+      j.jet_sv1_Lxy = NAN;
+      j.jet_sv1_Lxyz = NAN;
+      return;
+    }
+    double dx = j.jet_sv1_vtx_x.at(0) - j.PVx;
+    double dy = j.jet_sv1_vtx_y.at(0) - j.PVy;
+    double dz = j.jet_sv1_vtx_z.at(0) - j.PVz;
+    TVector3 vx(dx, dy, dz);
+    TVector3 jet_ax;
+    jet_ax.SetPtEtaPhi(j.jet_pt, j.jet_eta, j.jet_phi);
+    j.jet_sv1_dR = vx.DeltaR(jet_ax);
+    j.jet_sv1_Lxy = vx.Perp();
+    j.jet_sv1_Lxyz = vx.Mag();
+  }
+
   void fill_derived(Jet& jet) {
     auto sorted_d0 = sort_and_pad(jet.jet_trk_ip3d_d0sig, 3);
     jet.track_2_d0_significance = sorted_d0.at(1);
@@ -35,6 +57,8 @@ namespace {
     }
     jet.n_tracks_over_d0_threshold = n_over;
     // TODO: add jet width
+
+    fill_sv1_vertex(jet);
 
     // fill track-level stuff
     int n_tracks = jet.jet_trk_ip3d_z0.size();
@@ -280,6 +304,10 @@ Jets::Jets(SmartChain& chain):
   SET_BRANCH(avgmu);
   m_chain->SetBranch("mcwg", &mc_event_weight);
 
+  SET_BRANCH(PVx);
+  SET_BRANCH(PVy);
+  SET_BRANCH(PVz);
+
   // kinematics
   SET_BRANCH(jet_pt);
   SET_BRANCH(jet_eta);
@@ -408,6 +436,10 @@ Jet Jets::getJet(int pos) const {
   // event
   o.avgmu = avgmu;
   o.mc_event_weight = mc_event_weight;
+
+  o.PVx = PVx*mm;
+  o.PVy = PVy*mm;
+  o.PVz = PVz*mm;
 
   // kinematics                   // kinematics
   o.jet_pt = jet_pt->at(pos)*MeV;
