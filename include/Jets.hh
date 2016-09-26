@@ -42,6 +42,10 @@ struct Jet
   double avgmu;
   double mc_event_weight;
 
+  double PVx;
+  double PVy;
+  double PVz;
+
   // kinematics
   float jet_pt;
   float jet_eta;
@@ -171,10 +175,17 @@ struct Jet
   std::vector<int>   jet_jf_trk_vtx_ntrk;
   std::vector<float> jet_jf_trk_vtx_L3D;
   std::vector<float> jet_jf_trk_vtx_sig3D;
+  // sv1 vertices
+  float jet_sv1_dR;
+  float jet_sv1_Lxy;
+  float jet_sv1_Lxyz;
+  // --- end derived ---
 
+  // subjets
   std::vector<Jet> trkjets;
   std::vector<Jet> vrtrkjets;
 
+  // jet moments
   SubstructureMoments moments;
 
   // only defined for subjets
@@ -339,6 +350,10 @@ private:
   // event
   double avgmu;
   double mc_event_weight;
+
+  double PVx;
+  double PVy;
+  double PVz;
 
   // kinematics
   std::vector<float>* jet_pt;

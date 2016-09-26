@@ -7,55 +7,18 @@
 #include "select_jet.hh"
 #include "math.hh"
 #include "get_tree.hh"
+#include "hdf5_object_builders.hh"
 
 #include "H5Cpp.h"
 
 #include <iostream>
 #include <limits>
+#include <memory>
 
 const std::string DESCRIPTION = (
-  "Dump High-level information on jets to HDF5"
+  "Dump information on jets to HDF5"
   );
 
-namespace {
-  h5::HighLevelBTag get_btagging(const Jet& jet) {
-    h5::HighLevelBTag btag;
-#define COPY(var) btag.var = jet.jet_ ## var
-    COPY(pt);
-    COPY(eta);
-
-    COPY(ip3d_pb);
-    COPY(ip3d_pc);
-    COPY(ip3d_pu);
-
-    COPY(sv1_Nvtx);
-    COPY(sv1_ntrkv);
-    COPY(sv1_n2t);
-    COPY(sv1_m);
-    COPY(sv1_efc);
-    COPY(sv1_normdist);
-
-    // Jetfitter
-    COPY(jf_m);
-    COPY(jf_efc);
-    COPY(jf_deta);
-    COPY(jf_dphi);
-    COPY(jf_sig3d);
-    COPY(jf_nvtx);
-    COPY(jf_ntrkAtVx);
-    COPY(jf_nvtx1t);
-    COPY(jf_n2t);
-    COPY(jf_VTXsize);
-
-    // labeling
-    COPY(truthflav);
-    COPY(LabDr_HadF);
-
-#undef COPY
-
-    return btag;
-  }
-}
 
 // _____________________________________________________________________
 // main function
@@ -74,9 +37,17 @@ int main(int argc, char* argv[]) {
   Jets jets(chain);
   int n_entries = chain.GetEntries();
   if (opts.verbose) std::cout << "entires: " << n_entries << std::endl;
+  size_t csize = opts.chunk_size;
+  size_t tsize = opts.track_size;
 
   H5::H5File out_file(opts.output_file, H5F_ACC_TRUNC);
-  h5::Writer1d<h5::HighLevelBTag> jet_ds(out_file, "jets", 256);
+  h5::Writer1d<h5::HighLevelBTag> jet_ds(out_file, "jets", csize);
+
+  typedef h5::Writer<h5::Track> TrackWriter;
+  std::uniqe_ptr<TrackWriter> track_ds;
+  if (opts.tsize > 0) {
+    track_ds = new TrackWriter(out_file, "tracks", tsize, csize);
+  }
 
   for (int iii = 0; iii < n_entries; iii++) {
     chain.GetEntry(iii);
@@ -84,9 +55,14 @@ int main(int argc, char* argv[]) {
     for (int jjj = 0; jjj < n_jets; jjj++) {
       auto jet = jets.getJet(jjj);
       if (! select_fat_jet(jet) ) continue;
-      // double weight = opts.weight * jet.mc_event_weight;
       jet_ds.add_jet(get_btagging(jet));
+      if (track_ds) track_ds->add_jet(get_tracks(jet));
     }
+  }
+
+  if (track_ds) {
+    track_ds->flush();
+    track_ds->close();
   }
   jet_ds.flush();
   jet_ds.close();

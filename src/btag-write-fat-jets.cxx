@@ -1,13 +1,13 @@
 #include "Options.hh"
 #include "Jets.hh"
 #include "SmartChain.hh"
-// #include "FlavorPtEtaDistributions.hh"
 #include "HDF5Writer.hh"
 #include "constants.hh"
 #include "unshittify.hh"
 #include "select_jet.hh"
 #include "math.hh"
 #include "get_tree.hh"
+#include "hdf5_object_builders.hh"
 
 #include "H5Cpp.h"
 
@@ -35,11 +35,12 @@ int main(int argc, char* argv[]) {
   Jets jets(chain);
   int n_entries = chain.GetEntries();
   if (opts.verbose) std::cout << "entires: " << n_entries << std::endl;
+  size_t csize = opts.chunk_size;
 
   H5::H5File out_file(opts.output_file, H5F_ACC_TRUNC);
-  h5::Writer<h5::Cluster> cluster_ds(out_file, "clusters", 20, 256);
-  h5::Writer<h5::Track> track_ds(out_file, "tracks", 20, 256);
-  h5::Writer1d<h5::Jet> jet_ds(out_file, "jets", 256);
+  h5::Writer<h5::Cluster> cluster_ds(out_file, "clusters", 20, csize);
+  h5::Writer<h5::Track> track_ds(out_file, "tracks", 20, csize);
+  h5::Writer1d<h5::Jet> jet_ds(out_file, "jets", csize);
 
   for (int iii = 0; iii < n_entries; iii++) {
     chain.GetEntry(iii);
@@ -48,27 +49,9 @@ int main(int argc, char* argv[]) {
       auto jet = jets.getJet(jjj);
       if (! select_fat_jet(jet) ) continue;
       double weight = opts.weight * jet.mc_event_weight;
-      std::vector<h5::Cluster> clusters;
-      for (const auto& cluster: build_clusters(jet)) {
-        h5::Cluster cl;
-        cl.pt = cluster.pt;
-        cl.deta = cluster.eta - jet.jet_eta;
-        cl.dphi = cluster.dphi_jet;
-        cl.energy = cluster.e;
-        cl.mask = false;
-        clusters.push_back(cl);
-      }
-      std::vector<h5::Track> tracks;
-      for (const auto& track_vx: build_tracks(jet)) {
-        const auto& track = track_vx.track;
-        h5::Track tk;
-        tk.pt = track.pt;
-        tk.deta = track.eta - jet.jet_eta;
-        tk.dphi = phi_mpi_pi(track.phi, jet.jet_phi);
-        tk.mask = false;
-        tracks.push_back(tk);
-      }
+      const auto clusters = get_clusters(jet);
       cluster_ds.add_jet(clusters);
+      const auto tracks = get_tracks(jet);
       track_ds.add_jet(tracks);
       h5::Jet hjet{jet.jet_pt, jet.jet_eta};
       hjet.weight = weight;

@@ -129,6 +129,9 @@ namespace h5 {
     outfloat_t sv1_m;
     outfloat_t sv1_efc;
     outfloat_t sv1_normdist;
+    outfloat_t sv1_dR;
+    outfloat_t sv1_Lxy;
+    outfloat_t sv1_Lxyz;
 
     // Jetfitter
     outfloat_t jf_m;
