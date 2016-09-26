@@ -13,6 +13,8 @@ DICT         := dict
 OUTPUT       := bin
 LIB          := lib
 
+SHELL        := bash
+
 #  set search path
 vpath %.cxx  $(SRC)
 vpath %.hh   $(INC)
@@ -69,8 +71,11 @@ GEN_OBJ_PATHS  += $(TDICT_PATHS)
 # --- load in root config
 ROOTCFLAGS    := $(shell root-config --cflags)
 
-ROOTLIBS      := -L$(shell root-config --libs)
+ROOTLIBS      := $(shell root-config --libs)
 ROOTLIBS      += -Wl,-rpath,$(shell root-config --libdir)
+GCC_PATH      := $(shell which $(CXX))
+GCC_LIB_PATH  := $(dir $(GCC_PATH))../lib64
+ROOTLIBS      += -Wl,-rpath,$(GCC_LIB_PATH)
 
 ROOTLDFLAGS   := $(shell root-config --ldflags)
 
