@@ -15,4 +15,6 @@ cd btag2hdf5
 make
 ```
 
-After building, just run `. setup.sh` in each new session.
+After building all the libraries _should_ be permanently linked to
+CVMFS (thanks to some `-rpath` magic). There's no need to run the
+setup script next time you log in.

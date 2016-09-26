@@ -68,14 +68,16 @@ GEN_OBJ_PATHS  += $(TDICT_PATHS)
 
 # --- load in root config
 ROOTCFLAGS    := $(shell root-config --cflags)
-ROOTLIBS      := $(shell root-config --libs)
-ROOT_RPATH    := -Wl,-rpath,$(shell root-config --libdir)
-# ROOTLIBS      += -lCore -lTree -lRIO
+
+ROOTLIBS      := -L$(shell root-config --libdir)
+ROOTLIBS      += -Wl,-rpath,$(shell root-config --libdir)
+ROOTLIBS      += -lCore -lRIO -lTree -lPhysics
+
 ROOTLDFLAGS   := $(shell root-config --ldflags)
 
 CXXFLAGS     += $(ROOTCFLAGS)
 LDFLAGS      += $(ROOTLDFLAGS)
-LIBS         += $(ROOTLIBS) $(ROOT_RPATH)
+LIBS         += $(ROOTLIBS)
 
 # --- add HDF5
 HDF_INFO := $(shell h5c++ -showconfig | grep 'Installation point:')
