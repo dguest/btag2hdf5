@@ -38,15 +38,15 @@ int main(int argc, char* argv[]) {
   int n_entries = chain.GetEntries();
   if (opts.verbose) std::cout << "entires: " << n_entries << std::endl;
   size_t csize = opts.chunk_size;
-  size_t tsize = opts.track_size;
 
   H5::H5File out_file(opts.output_file, H5F_ACC_TRUNC);
   h5::Writer1d<h5::HighLevelBTag> jet_ds(out_file, "jets", csize);
 
   typedef h5::Writer<h5::Track> TrackWriter;
-  std::uniqe_ptr<TrackWriter> track_ds;
-  if (opts.tsize > 0) {
-    track_ds = new TrackWriter(out_file, "tracks", tsize, csize);
+  std::unique_ptr<TrackWriter> track_ds;
+  if (opts.track_size > 0) {
+    track_ds.reset(
+      new TrackWriter(out_file, "tracks", opts.track_size, csize));
   }
 
   for (int iii = 0; iii < n_entries; iii++) {
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
     int n_jets = jets.size();
     for (int jjj = 0; jjj < n_jets; jjj++) {
       auto jet = jets.getJet(jjj);
-      if (! select_fat_jet(jet) ) continue;
+      if (! select_jet(jet) ) continue;
       jet_ds.add_jet(get_btagging(jet));
       if (track_ds) track_ds->add_jet(get_tracks(jet));
     }
