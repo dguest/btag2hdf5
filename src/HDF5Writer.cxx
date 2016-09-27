@@ -151,6 +151,11 @@ namespace {
     INSERT(ip3d_pc);
     INSERT(ip3d_pb);
 
+    INSERT(ipmp_pu);
+    INSERT(ipmp_pc);
+    INSERT(ipmp_pb);
+    INSERT(ipmp_ptau);
+
     // sv1
     INSERT(sv1_Nvtx);
     INSERT(sv1_ntrkv);

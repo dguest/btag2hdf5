@@ -122,6 +122,12 @@ namespace h5 {
     outfloat_t ip3d_pc;
     outfloat_t ip3d_pb;
 
+    // ipmp
+    outfloat_t ipmp_pu;
+    outfloat_t ipmp_pc;
+    outfloat_t ipmp_pb;
+    outfloat_t ipmp_ptau;
+
     // sv1
     int sv1_Nvtx;
     int sv1_ntrkv;

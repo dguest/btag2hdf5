@@ -353,6 +353,11 @@ Jets::Jets(SmartChain& chain):
   SET_BRANCH(jet_ip3d_pc);
   SET_BRANCH(jet_ip3d_pu);
 
+  SET_BRANCH(jet_ipmp_pb);
+  SET_BRANCH(jet_ipmp_pc);
+  SET_BRANCH(jet_ipmp_pu);
+  SET_BRANCH(jet_ipmp_ptau);
+
   SET_BRANCH(jet_sv1_ntrkj);
   SET_BRANCH(jet_sv1_ntrkv);
   SET_BRANCH(jet_sv1_n2t);
@@ -486,6 +491,12 @@ Jet Jets::getJet(int pos) const {
   COPY(jet_ip3d_pb);
   COPY(jet_ip3d_pc);
   COPY(jet_ip3d_pu);
+  // ipmp
+  COPY(jet_ipmp_pb);
+  COPY(jet_ipmp_pc);
+  COPY(jet_ipmp_pu);
+  COPY(jet_ipmp_ptau);
+
   // sv1                          // sv1
   COPY(jet_sv1_ntrkj);
   COPY(jet_sv1_ntrkv);

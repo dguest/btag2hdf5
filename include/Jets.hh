@@ -90,6 +90,12 @@ struct Jet
   float jet_ip3d_pb;
   float jet_ip3d_pc;
   float jet_ip3d_pu;
+
+  double jet_ipmp_pb;
+  double jet_ipmp_pc;
+  double jet_ipmp_pu;
+  double jet_ipmp_ptau;
+
   // sv1
   int jet_sv1_ntrkj;
   int jet_sv1_ntrkv;
@@ -398,6 +404,11 @@ private:
   std::vector<float>* jet_ip3d_pb;
   std::vector<float>* jet_ip3d_pc;
   std::vector<float>* jet_ip3d_pu;
+
+  std::vector<double>* jet_ipmp_pb;
+  std::vector<double>* jet_ipmp_pc;
+  std::vector<double>* jet_ipmp_pu;
+  std::vector<double>* jet_ipmp_ptau;
   // sv1
   std::vector<int>* jet_sv1_ntrkj;
   std::vector<int>* jet_sv1_ntrkv;

@@ -42,6 +42,11 @@ h5::HighLevelBTag get_btagging(const Jet& jet) {
   COPY(ip3d_pc);
   COPY(ip3d_pu);
 
+  COPY(ipmp_pb);
+  COPY(ipmp_pc);
+  COPY(ipmp_pu);
+  COPY(ipmp_ptau);
+
   COPY(sv1_Nvtx);
   COPY(sv1_ntrkv);
   COPY(sv1_n2t);
