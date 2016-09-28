@@ -1,6 +1,7 @@
 # setup script for HDF5 dumper
 echo -n "setting up ATLAS..."
-setupATLAS -q
+export ATLAS_LOCAL_ROOT_BASE=/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase
+. ${ATLAS_LOCAL_ROOT_BASE}/user/atlasLocalSetup.sh -q
 echo " done"
 
 # -- get boost --
