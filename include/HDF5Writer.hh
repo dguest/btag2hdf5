@@ -144,6 +144,7 @@ namespace h5 {
     outfloat_t jf_efc;
     outfloat_t jf_deta;
     outfloat_t jf_dphi;
+    outfloat_t jf_dr;
     outfloat_t jf_sig3d;
     int jf_nvtx;
     int jf_ntrkAtVx;

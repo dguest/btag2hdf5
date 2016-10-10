@@ -4,6 +4,8 @@
 #include "HDF5Writer.hh"
 #include "math.hh"
 
+#include <cmath>
+
 std::vector<h5::Cluster> get_clusters(const Jet& jet) {
   std::vector<h5::Cluster> clusters;
   for (const auto& cluster: build_clusters(jet)) {
@@ -62,6 +64,7 @@ h5::HighLevelBTag get_btagging(const Jet& jet) {
   COPY(jf_efc);
   COPY(jf_deta);
   COPY(jf_dphi);
+  btag.jf_dr = std::hypot(jet.jet_jf_deta, jet.jet_jf_dphi);
   COPY(jf_sig3d);
   COPY(jf_nvtx);
   COPY(jf_ntrkAtVx);

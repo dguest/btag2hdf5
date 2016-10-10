@@ -172,6 +172,7 @@ namespace {
     INSERT(jf_efc);
     INSERT(jf_deta);
     INSERT(jf_dphi);
+    INSERT(jf_dr);
     INSERT(jf_sig3d);
     INSERT(jf_nvtx);
     INSERT(jf_ntrkAtVx);
